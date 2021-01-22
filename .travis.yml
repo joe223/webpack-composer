@@ -10,7 +10,7 @@ node_js:
   - '10'
 before_install:
 install:
-  - npm run test
+  - yarn
 script:
   - npm run build
   - npm run test

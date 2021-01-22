@@ -1,4 +1,5 @@
 import type { Configuration } from 'webpack'
+import Composer from '../src'
 
 const path = require('path')
 const composer = (baseOpt: Configuration): Composer => ({}) as Composer
@@ -71,3 +72,11 @@ composer({
         ])
         .noParse((content) => /jquery|lodash/.test(content))
         .unsafeCache(false)
+
+Composer()
+    .module.rules.$push({
+        test: /\.(jpg|png)$/,
+        use: 'file-loader'
+    }, 'file')
+    // We know rules is Array
+    .module.rules.$find('file').test(/\.(jpg|png|gif|webp)$/)
