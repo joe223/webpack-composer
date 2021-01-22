@@ -1,36 +1,41 @@
 import type { Configuration } from 'webpack'
 
 type DynamicExtends<T> = {
-    [K in keyof T]: T[K] extends (string | number | boolean)
+    [K in keyof T]-?: T[K] extends (string | number | boolean)
         ? PropEditor<T, K>
         : PropEditor<T, K> & DynamicExtends<T[K]>
 }
 
 type PropEditor<T, K extends keyof T> = {
     (value: T[K]): WebpackConfig
-    delete (): WebpackConfig
+    $delete (): WebpackConfig
 }
 
 type WebpackConfig = DynamicExtends<Configuration> & {
-    genConfig: () => Configuration
+    $config: () => Configuration
 }
 
-const KEY_GEN_CONFIG = 'genConfig'
-const KEY_DELETE = 'delete'
-const RESERVED_PROP_NAME = [
-    KEY_GEN_CONFIG
-]
+const RESERVED_PROP = {
+    GEN_CONFIG: '$config',
+    DELETE: '$delete'
+}
+const NOOP = void 0
+const isObject = (obj: any) => Boolean(obj && typeof obj === 'object')
 
 export default function Composer (options: Configuration = {}) {
-    let propChain = []
+    let propChain: string[] = []
 
-    const propSetter = value => {
+    const emptyPropChain = () => {
+        propChain = []
+    }
+
+    const propSetter = (value: any) => {
         let currentProp = options
         let propName = propChain.shift()
 
         while (propName
-            && Reflect.has(currentProp, propName)
             && propChain.length
+            && Reflect.get(currentProp, propName) !== NOOP
         ) {
             currentProp = Reflect.get(currentProp, propName)
             propName = propChain.shift()
@@ -46,27 +51,48 @@ export default function Composer (options: Configuration = {}) {
             propName = propChain.shift()
         }
 
-        propChain = []
+        emptyPropChain()
+
+        return new Proxy(propSetter, handler) as WebpackConfig
+    }
+
+    const propsDeleter = () => {
+        let currentProp = options
+        let propName = propChain.shift()
+
+        while (propName
+            && currentProp
+            && propChain.length
+            && Reflect.has(currentProp, propName)
+        ) {
+            currentProp = Reflect.get(currentProp, propName)
+            propName = propChain.shift()
+        }
+
+        if (!propChain.length && isObject(currentProp) && propName) {
+            Reflect.deleteProperty(currentProp, propName)
+        }
+
+        emptyPropChain()
 
         return new Proxy(propSetter, handler) as WebpackConfig
     }
 
     const handler = {
-        get (target, key) {
-            if (RESERVED_PROP_NAME.indexOf(key) === -1) {
+        get (target: object, key: string): WebpackConfig | (() => Configuration) {
+            if (Object.values(RESERVED_PROP).indexOf(key) === -1) {
                 propChain.push(key)
             }
 
             switch (key) {
-                case KEY_GEN_CONFIG: {
+                case RESERVED_PROP.GEN_CONFIG: {
                     return () => options
                 }
-                case KEY_DELETE: {
-                    // TODO
-                    return () => options
+                case RESERVED_PROP.DELETE: {
+                    return new Proxy(propsDeleter, handler) as WebpackConfig
                 }
                 default: {
-                    return new Proxy(propSetter, handler)
+                    return new Proxy(propSetter, handler) as WebpackConfig
                 }
             }
         }

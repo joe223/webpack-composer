@@ -6,6 +6,40 @@ describe('Proxy', () => {
         const config = Composer({
             entry: 'src/entry.js',
             context: 'foo',
+        }).$config()
+
+        expect(config).toEqual({
+            entry: 'src/entry.js',
+            context: 'foo',
+        })
+    })
+
+    test('deleter', () => {
+        const config = Composer({
+            entry: 'src/entry.js',
+            context: 'foo',
+            output: {
+                path: 'bar'
+            },
+            resolve: {
+                extensions: ['.js', '.jsx', '.jsm']
+            }
+        })
+            .entry.$delete()
+            .output.path.$delete()
+            .resolve.$delete()
+            .$config()
+
+        expect(config).toEqual({
+            context: 'foo',
+            output: {}
+        })
+    })
+
+    test('setter', () => {
+        const config = Composer({
+            entry: 'src/entry.js',
+            context: 'foo',
         })
             .context('bar')
             .output({
@@ -24,7 +58,7 @@ describe('Proxy', () => {
                 styles: path.resolve(__dirname, '../src/styles'),
                 'react-dom': '@hot-loader/react-dom'
             })
-            .genConfig()
+            .$config()
 
         expect(config).toEqual({
             entry: 'src/entry.js',

@@ -1,0 +1,17 @@
+language: node_js
+cache:
+  directories:
+    - ~/.npm
+    - node_modules
+addons:
+  chrome: stable
+node_js:
+  - stable
+  - '10'
+before_install:
+install:
+  - npm run test
+script:
+  - npm run build
+  - npm run test
+  - npm run report
