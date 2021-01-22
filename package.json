@@ -4,6 +4,7 @@
   "description": "Webpack configuration composer",
   "main": "lib/index.js",
   "types": "types/index.d.ts",
+  "private": false,
   "scripts": {
     "test": "jest",
     "dev": "jest --watch",

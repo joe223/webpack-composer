@@ -1,8 +1,8 @@
 # Webpack-Composer
 
-[![](https://img.shields.io/npm/v/@cranejs/webpack-composer)](https://www.npmjs.com/package/@cranejs/webpack-composer")
-[![](https://travis-ci.com/joe223/webpack-composer.svg?branch=master&status=errored)](https://travis-ci.com/github/joe223/webpack-composer)
-[![](https://img.shields.io/coveralls/github/joe223/webpack-composer/master)](https://coveralls.io/github/joe223/webpack-composer?branch=master)
+[![](https://img.shields.io/npm/v/@cranejs/webpack-composer?style=flat&colorA=000000&colorB=000000)](https://www.npmjs.com/package/@cranejs/webpack-composer")
+[![](https://img.shields.io/travis/com/joe223/webpack-composer?style=flat&colorA=000000&colorB=000000)](https://travis-ci.com/github/joe223/webpack-composer)
+[![](https://img.shields.io/coveralls/github/joe223/webpack-composer/master?style=flat&colorA=000000&colorB=000000)](https://coveralls.io/github/joe223/webpack-composer?branch=master)
 
 Simplify the modification of webpack configuration. This repository is **WIP**, do not use it in production.
 
