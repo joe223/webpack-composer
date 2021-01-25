@@ -77,4 +77,23 @@ describe('Proxy', () => {
             }
         })
     })
+
+    test('finder', () => {
+        const config = Composer({
+            module: {
+                rules: [
+                    {
+                        test: /.jsx?$/,
+                        exclude: /node_modules/,
+                        loader: 'babel-loader'
+                    },
+                    {
+                        test: /\.(jpg|png)$/,
+                        use: 'file-loader'
+                    }
+                ]
+            }
+        })
+            .module.rules.$find('').test
+    })
 })

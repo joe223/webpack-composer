@@ -1,6 +1,6 @@
 import type { Configuration } from 'webpack';
 declare type DynamicExtends<T> = {
-    [K in keyof T]: T[K] extends (string | number | boolean) ? PropEditor<T, K> : PropEditor<T, K> & DynamicExtends<T[K]>;
+    [K in keyof T]-?: T[K] extends (string | number | boolean) ? PropEditor<T, K> : PropEditor<T, K> & DynamicExtends<T[K]>;
 };
 declare type PropEditor<T, K extends keyof T> = {
     (value: T[K]): WebpackConfig;

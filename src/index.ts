@@ -1,14 +1,21 @@
-import type { Configuration } from 'webpack'
+import type {
+    Configuration,
+    RuleSetRule
+ } from 'webpack'
 
 type DynamicExtends<T> = {
     [K in keyof T]-?: T[K] extends (string | number | boolean)
         ? PropEditor<T, K>
-        : PropEditor<T, K> & DynamicExtends<T[K]>
+        : PropEditor<T, K> & PropFinder<T[K]> & DynamicExtends<T[K]>
 }
 
 type PropEditor<T, K extends keyof T> = {
     (value: T[K]): WebpackConfig
     $delete (): WebpackConfig
+}
+
+type PropFinder<T> = {
+    $find<S extends T>(name: string): DynamicExtends<S>;
 }
 
 type WebpackConfig = DynamicExtends<Configuration> & {
@@ -25,7 +32,7 @@ const isObject = (obj: any) => Boolean(obj && typeof obj === 'object')
 export default function Composer (options: Configuration = {}) {
     let propChain: string[] = []
 
-    const emptyPropChain = () => {
+    const cleanPropChain = () => {
         propChain = []
     }
 
@@ -51,7 +58,7 @@ export default function Composer (options: Configuration = {}) {
             propName = propChain.shift()
         }
 
-        emptyPropChain()
+        cleanPropChain()
 
         return new Proxy(propSetter, handler) as WebpackConfig
     }
@@ -73,7 +80,7 @@ export default function Composer (options: Configuration = {}) {
             Reflect.deleteProperty(currentProp, propName)
         }
 
-        emptyPropChain()
+        cleanPropChain()
 
         return new Proxy(propSetter, handler) as WebpackConfig
     }
