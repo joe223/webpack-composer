@@ -1,3 +1,4 @@
+import { RuleSetRule } from 'webpack'
 import Composer from '../../src'
 const path = require('path')
 
@@ -88,12 +89,38 @@ describe('Proxy', () => {
                         loader: 'babel-loader'
                     },
                     {
-                        test: /\.(jpg|png)$/,
                         use: 'file-loader'
                     }
                 ]
             }
         })
-            .module.rules.$find('').test
+            .module.rules[1]({
+                test: /\.(jpg|png)$/,
+                use: 'file-loader'
+            }, 'image')
+            .module.rules.$find<RuleSetRule>('image', rule => {
+                console.log(rule)
+
+                if (rule) rule.test = /\.(jpg|png|gif)$/
+
+                console.log(rule)
+            })
+            .$config()
+
+        expect(config).toEqual({
+            module: {
+                rules: [
+                    {
+                        test: /.jsx?$/,
+                        exclude: /node_modules/,
+                        loader: 'babel-loader'
+                    },
+                    {
+                        test: /\.(jpg|png|gif)$/,
+                        use: 'file-loader'
+                    }
+                ]
+            }
+        })
     })
 })
